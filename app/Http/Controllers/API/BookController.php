@@ -20,10 +20,10 @@ class BookController extends Controller
                 'price' => 'required|max:10',
                 'availability' => 'required|max:10',
             ]);
+
         	Book::create($request->all());
-        	return response()->json(['status' => 'success']);
+        	return response()->json(['status' => 'success', 'message' => 'Book record successfully created']);
         } catch (Throwable $e) {
-            report($e);
             return response()->json(['status' => 'fail', 'message' => $e->message]);
         }
     }
@@ -31,27 +31,32 @@ class BookController extends Controller
     public function list()
     {
         $books = Book::all();
-        return response()->json(['status' => 'success', 'data' => $books]);
+        if(!empty($books)){
+            return response()->json(['status' => 'success', 'data' => $books, 'message' => 'data retrieved']);
+        }
+        return response()->json(['status' => 'fail', 'message' => 'Data not found']);
+        
     }
  
     public function record($id)
     {
-        if($id){
-            $book = Book::find($id);
+        $book = Book::find($id);
+        if(!empty($book)){
             return response()->json(['status' => 'success', 'data' => $book]);
         }
-        return response()->json(['status' => 'fail', 'data' => []]);
+        
+        return response()->json(['status' => 'fail', 'message' => 'Data not found']);
         
     }
 
 
     public function update(Request $request, $id)
     {
-        if($id){
-            $res = Book::where('id', $id)->update($request->all());
-    		return response()->json(['status' => 'success', 'data' => $res]);
+        $result = Book::where('id', $id)->update($request->all());
+        if($result){
+            return response()->json(['status' => 'success', 'data' => $res]);
         }
-        return response()->json(['status' => 'fail', 'data' => []]);
+        return response()->json(['status' => 'fail', 'message' => 'Validation Fail']);
     }
 
     public function search($type, $param)
@@ -61,8 +66,7 @@ class BookController extends Controller
         }else{
            $filterData = Book::where($type,'LIKE','%'.$param.'%')
                       ->get(); 
-        }
-        
+        }        
         return response()->json(['status' => 'success', 'data' => $filterData]);
     }
 }
