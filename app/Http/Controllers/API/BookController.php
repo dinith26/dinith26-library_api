@@ -36,15 +36,22 @@ class BookController extends Controller
  
     public function record($id)
     {
-        $book = Book::find($id);
-        return response()->json(['status' => 'success', 'data' => $book]);
+        if($id){
+            $book = Book::find($id);
+            return response()->json(['status' => 'success', 'data' => $book]);
+        }
+        return response()->json(['status' => 'fail', 'data' => []]);
+        
     }
 
 
     public function update(Request $request, $id)
     {
-        $res = Book::where('id', $id)->update($request->all());
-		return response()->json(['status' => 'success', 'data' => $res]);
+        if($id){
+            $res = Book::where('id', $id)->update($request->all());
+    		return response()->json(['status' => 'success', 'data' => $res]);
+        }
+        return response()->json(['status' => 'fail', 'data' => []]);
     }
 
     public function search($type, $param)
